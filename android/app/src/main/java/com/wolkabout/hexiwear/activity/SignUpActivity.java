@@ -21,7 +21,6 @@
 package com.wolkabout.hexiwear.activity;
 
 
-import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +28,8 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.wolkabout.hexiwear.R;
 import com.wolkabout.hexiwear.util.Dialog;

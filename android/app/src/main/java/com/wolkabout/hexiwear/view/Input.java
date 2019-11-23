@@ -22,8 +22,6 @@ package com.wolkabout.hexiwear.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.ContextCompat;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -32,6 +30,9 @@ import android.util.AttributeSet;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.textfield.TextInputLayout;
 import com.wolkabout.hexiwear.R;
 
 import org.androidannotations.annotations.AfterTextChange;

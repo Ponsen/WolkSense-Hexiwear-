@@ -47,24 +47,24 @@
 
                     <com.wolkabout.hexiwear.view.Input_
                         android:id="@+id/emailField"
+                        app:text="@string/demoUser"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         app:errorTextAppearance="@style/DarkerErrorAppearance"
                         app:hint="@string/login_email_hint"
                         app:textColor="@color/white"
-                        app:type="email"/>
+                        app:type="email" />
 
-                    <com.wolkabout.hexiwear.view.Input_
+                    <EditText
                         android:id="@+id/passwordField"
+                        android:text="@string/demoPw"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        app:actionLabel="@string/login_sign_in"
-                        app:errorTextAppearance="@style/DarkerErrorAppearance"
-                        app:hint="@string/login_password_hint"
-                        app:textColor="@color/white"
-                        app:type="password"/>
+                        android:hint="@string/login_password_hint"
+                        android:textColor="@color/white"
+                        android:inputType="textPassword"/>
 
                     <Button
                         android:id="@+id/signInButton"

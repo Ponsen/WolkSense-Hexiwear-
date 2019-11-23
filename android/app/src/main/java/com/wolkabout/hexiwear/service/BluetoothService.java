@@ -21,6 +21,7 @@
 package com.wolkabout.hexiwear.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -34,11 +35,13 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.wolkabout.hexiwear.BuildConfig;
 import com.wolkabout.hexiwear.R;
@@ -56,6 +59,7 @@ import com.wolkabout.wolk.ReadingType;
 import com.wolkabout.wolk.Wolk;
 import com.wolkabout.wolkrestandroid.Credentials_;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.Receiver;
@@ -120,6 +124,8 @@ public class BluetoothService extends Service {
     private Wolk wolk;
     private Mode mode;
 
+    String NOTIFICATION_CHANNEL_ID = BuildConfig.APPLICATION_ID;
+
     @Bean
     HexiwearDevices hexiwearDevices;
 
@@ -178,7 +184,7 @@ public class BluetoothService extends Service {
             return;
         }
 
-        wolk = new Wolk(hexiwearDevice, BuildConfig.MQTT_HOST);
+        wolk = new Wolk(hexiwearDevice, BuildConfig.MQTT_HOST); //; TODO: Add new url "");
         wolk.setLogger(new Logger() {
             @Override
             public void info(final String message) {
@@ -204,12 +210,12 @@ public class BluetoothService extends Service {
                 isConnected = BluetoothProfile.STATE_CONNECTED == newState;
                 if (isConnected) {
                     Log.i(TAG, "GATT connected.");
-                    startForeground(442, getNotification(device));
+                    startForeground(420, getNotification(device));
                     gatt.discoverServices();
                 } else {
                     Log.i(TAG, "GATT disconnected.");
                     NotificationService_.intent(BluetoothService.this).stop();
-                    notificationManager.notify(442, getNotification(device));
+                    notificationManager.notify(420, getNotification(device));
                     gatt.connect();
                 }
 
@@ -355,6 +361,22 @@ public class BluetoothService extends Service {
             }
         }
     }
+
+    @AfterInject
+    void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    TAG,
+                    NotificationManager.IMPORTANCE_NONE
+            );
+
+            serviceChannel.setLightColor(R.color.aqua);
+            serviceChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            notificationManager.createNotificationChannel(serviceChannel);
+        }
+    }
+
 
     @Receiver(actions = PREFERENCE_CHANGED, local = true)
     void preferenceChanged(@Receiver.Extra String preferenceName, @Receiver.Extra boolean preferenceEnabled) {
@@ -558,13 +580,16 @@ public class BluetoothService extends Service {
         final Intent stopIntent = new Intent(STOP);
         final PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, 0);
 
-        return new NotificationCompat.Builder(this)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        return notificationBuilder.setOngoing(true)
                 .setSmallIcon(icon)
                 .setContentTitle(getResources().getString(R.string.app_name))
                 .setContentIntent(pendingIntentMain)
                 .setLights(Color.GREEN, 100, 5000)
                 .addAction(R.drawable.ic_cloud_off_black_24dp, "Stop", pendingStopIntent)
-                .setContentText(text).build();
+                .setContentText(text)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build();
     }
 
     @Override

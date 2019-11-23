@@ -31,9 +31,10 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.CallLog;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Background;

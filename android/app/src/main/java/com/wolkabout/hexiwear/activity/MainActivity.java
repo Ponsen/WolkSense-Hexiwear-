@@ -20,15 +20,14 @@
 
 package com.wolkabout.hexiwear.activity;
 
+import android.Manifest;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +35,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.wolkabout.hexiwear.R;
 import com.wolkabout.hexiwear.adapter.DeviceListAdapter;
@@ -61,12 +66,23 @@ import org.androidannotations.annotations.Receiver;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @OptionsMenu(R.menu.menu_main)
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String OTAP_PREFIX = "OTAP";
+    private static final int ASK_MULTIPLE_PERMISSION_REQUEST_CODE = 15612;
+
+    String[] permissions = new String[]{
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.FOREGROUND_SERVICE,
+            Manifest.permission.READ_CALL_LOG,
+            Manifest.permission.READ_SMS};
 
     @Bean
     DeviceListAdapter adapter;
@@ -109,6 +125,47 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @AfterInject
     void setStore() {
         devicesStore.init();
+    }
+
+    @AfterInject
+    void initPermissions(){
+        checkPermissions();
+    }
+
+    private boolean checkPermissions() {
+        int result;
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p : permissions) {
+            result = ContextCompat.checkSelfPermission(getApplicationContext(), p);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), ASK_MULTIPLE_PERMISSION_REQUEST_CODE);
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case ASK_MULTIPLE_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "onRequestPermissionsResult: granted");
+                    deviceDiscoveryService.startScan();
+                } else {
+                    String perStr = "";
+                    for (String per : permissions) {
+                        perStr += "\n" + per;
+                    }
+                    Log.w(TAG, String.format("onRequestPermissionsResult: not granted - ", perStr));
+                }
+                return;
+            }
+        }
     }
 
     @AfterViews

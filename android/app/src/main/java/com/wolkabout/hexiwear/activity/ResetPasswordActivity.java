@@ -20,15 +20,16 @@
 
 package com.wolkabout.hexiwear.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.wolkabout.hexiwear.R;
 import com.wolkabout.hexiwear.util.Dialog;
-import com.wolkabout.hexiwear.view.Input;
 import com.wolkabout.wolkrestandroid.dto.ResetPasswordRequest;
 import com.wolkabout.wolkrestandroid.service.AuthenticationService;
 
@@ -49,7 +50,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private static final String TAG = ResetPasswordActivity.class.getSimpleName();
 
     @ViewById
-    Input email;
+    EditText email;
 
     @ViewById
     ProgressBar progressBar;
@@ -67,13 +68,13 @@ public class ResetPasswordActivity extends AppCompatActivity {
     @EditorAction(R.id.email)
     @Background
     void resetPassword() {
-        if (email.isEmpty()) {
-            email.setError(R.string.registration_error_email_required);
+        if (email.getText().toString().isEmpty()) {
+            email.setError(getText(R.string.registration_error_email_required));
             return;
         }
 
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.getValue()).matches()) {
-            email.setError(R.string.registration_error_invalid_email);
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()) {
+            email.setError(getText(R.string.registration_error_invalid_email));
             return;
         }
 
@@ -84,7 +85,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     void submitResetPassword() {
         showResetPending();
         try {
-            authenticationService.resetPassword(new ResetPasswordRequest(email.getValue()));
+            authenticationService.resetPassword(new ResetPasswordRequest(email.getText().toString()));
             hideResetPending();
             showInfoDialog(R.string.reset_password_success);
         } catch (HttpStatusCodeException e) {

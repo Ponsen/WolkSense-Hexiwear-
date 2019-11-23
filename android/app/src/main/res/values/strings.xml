@@ -161,4 +161,7 @@
     <string name="change_password_mismatch_error">Please enter the same new password and confirm new password.</string>
     <string name="change_password_old_invalid">Please enter a valid old password and try again.</string>
 
+    <string name="demoUser">Demo</string>
+    <string name="demoPw">Demo</string>
+
 </resources>

@@ -41,8 +41,10 @@ import com.wolkabout.wolkrestandroid.dto.PointWithFeedsResponse;
 import com.wolkabout.wolkrestandroid.dto.SerialDto;
 import com.wolkabout.wolkrestandroid.enumeration.SensorType;
 import com.wolkabout.wolkrestandroid.service.DeviceService;
+import com.wolkabout.wolkrestandroid.service.DeviceService_;
 import com.wolkabout.wolkrestandroid.service.PointService;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
@@ -74,6 +76,11 @@ public class DeviceRegistrationService {
     @RestService
     PointService pointService;
 
+    @AfterInject
+    void afterInject() {
+        deviceService = new DeviceService_(context);
+    }
+
     @Background
     public void registerHexiwearDevice(final BluetoothDevice device) {
         if (credentials.username().get().equals("Demo")) {
@@ -81,6 +88,7 @@ public class DeviceRegistrationService {
             final HexiwearDevice hexiwearDevice = new HexiwearDevice(device.getName(), "", device.getAddress(), "", "Demo device " + demoNumber);
             devicesStore.storeDevice(hexiwearDevice);
             ReadingsActivity_.intent(context).device(device).start();
+            return;
         }
 
         final SerialDto serialDto = deviceService.getRandomSerial(SensorType.HEXIWEAR);
@@ -105,7 +113,7 @@ public class DeviceRegistrationService {
         builder.setTitle(R.string.activation_dialog_title);
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                //dialog.cancel();
+                dialog.cancel();
             }
         });
         builder.setPositiveButton(R.string.activation_dialog_confirm, new DialogInterface.OnClickListener() {

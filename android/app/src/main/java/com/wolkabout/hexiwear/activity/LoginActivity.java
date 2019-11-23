@@ -20,13 +20,15 @@
 
 package com.wolkabout.hexiwear.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.wolkabout.hexiwear.R;
 import com.wolkabout.hexiwear.util.Dialog;
@@ -60,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
     Input emailField;
 
     @ViewById
-    Input passwordField;
+    EditText passwordField;
 
     @ViewById
     View signInElements;
@@ -113,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
     @Click(R.id.signInButton)
     @EditorAction(R.id.passwordField)
     void attemptSignIn() {
-        if ("demo".equals(emailField.getValue()) && "demo".equals(passwordField.getValue())) {
+        if ("Demo".equals(emailField.getValue()) && "Demo".equals(passwordField.getText().toString())) {
             credentials.username().put("Demo");
             MainActivity_.intent(LoginActivity.this).start();
             finish();
@@ -136,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
     void signIn() {
         try {
             final String emailAddress = emailField.getValue();
-            final String password = passwordField.getValue();
+            final String password = passwordField.getText().toString();
 
             final AuthenticationResponseDto response = authenticationService.signIn(new SignInDto(emailAddress, password));
             credentials.username().put(response.getEmail());
@@ -178,8 +180,8 @@ public class LoginActivity extends AppCompatActivity {
             return false;
         }
 
-        if (passwordField.isEmpty()) {
-            passwordField.setError(R.string.registration_error_password_required);
+        if (passwordField.getText().toString().isEmpty()) {
+            passwordField.setError(getText(R.string.registration_error_password_required));
             return false;
         }
 
